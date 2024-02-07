@@ -89,11 +89,16 @@ WSGI_APPLICATION = 'healthmate.wsgi.application'
 # }
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": "healthmate",
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',  # Use 'django.db.backends.postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': BASE_DIR / 'db.sqlite3',  # Path to database file if using SQLite.
+        'USER': '',                        # Not used with SQLite.
+        'PASSWORD': '',                    # Not used with SQLite.
+        'HOST': '',                        # Set to empty string for localhost. Not used with SQLite.
+        'PORT': '',                        # Set to empty string for default. Not used with SQLite.
     }
 }
+
 
 
 # Password validation
