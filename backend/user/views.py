@@ -1,19 +1,21 @@
-from django.shortcuts import render
-from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 from .serializers import UserSerializer
+from django.contrib.auth.hashers import make_password
+from django.utils import timezone
 
-@api_view(['POST'])
-def signup(request):
-    serializer = UserSerializer(data=request.data)
-    if serializer.is_valid():
-        # Check if email and confirm_email match
-        if serializer.validated_data['email'] != serializer.validated_data['confirm_email']:
-            return Response({'error': 'Email addresses do not match'}, status=400)
-        # Check if password and confirm_password match
-        if serializer.validated_data['password'] != serializer.validated_data['confirm_password']:
-            return Response({'error': 'Passwords do not match'}, status=400)
-        
-        serializer.save()
-        return Response(serializer.data, status=201)
-    return Response(serializer.errors, status=400)
+class Signup(APIView):
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            # Hash the password before saving
+            serializer.validated_data['password'] = make_password(serializer.validated_data['password'])
+            
+            # Optionally add created_at and updated_at timestamps
+            serializer.validated_data['created_at'] = timezone.now()
+            serializer.validated_data['updated_at'] = timezone.now()
+            
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
