@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_prometheus',
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -76,17 +77,29 @@ WSGI_APPLICATION = 'healthmate.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django_prometheus.db.backends.postgresql',
+#         'NAME': 'healthmate',
+#         'USER': 'team62',
+#         'PASSWORD': 'team62',
+#         # 'HOST': 'sqldb',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django_prometheus.db.backends.postgresql',
-        'NAME': 'healthmate',
-        'USER': 'team62',
-        'PASSWORD': 'team62',
-        # 'HOST': 'sqldb',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',  # Use 'django.db.backends.postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': BASE_DIR / 'db.sqlite3',  # Path to database file if using SQLite.
+        'USER': '',                        # Not used with SQLite.
+        'PASSWORD': '',                    # Not used with SQLite.
+        'HOST': '',                        # Set to empty string for localhost. Not used with SQLite.
+        'PORT': '',                        # Set to empty string for default. Not used with SQLite.
     }
 }
+
 
 
 # Password validation
