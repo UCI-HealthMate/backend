@@ -9,10 +9,8 @@ class Signup(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            # Hash the password before saving
             serializer.validated_data['password'] = make_password(serializer.validated_data['password'])
             
-            # Optionally add created_at and updated_at timestamps
             serializer.validated_data['created_at'] = timezone.now()
             serializer.validated_data['updated_at'] = timezone.now()
             
