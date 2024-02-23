@@ -1,13 +1,15 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from .serializers import UserSerializer
+from rest_framework import generics,status,views,permissions
+from .serializers import SignupSerializer,LoginSerializer,LogoutSerializer
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
-class Signup(APIView):
+class Signup(generics.GenericAPIView):
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
+        serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
             serializer.validated_data['password'] = make_password(serializer.validated_data['password'])
             
