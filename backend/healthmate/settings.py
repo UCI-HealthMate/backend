@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_prometheus',
     'user',
+    'menu',
+    'django_celery_beat',
+    'celery',
 ]
 
 MIDDLEWARE = [
@@ -142,3 +146,14 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# CELERY_BROKER_URL = 'amqp://guest:guest@localhost'
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+CELERY_BEAT_SCHEDULE = {
+    'fetch-menu': {
+        'task': 'healthmate.tasks.fetch_and_update_menu',
+        'schedule': timedelta(weeks=1),  # Run the task every week
+    },
+}
