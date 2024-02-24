@@ -10,7 +10,7 @@ class SignupAPIView(generics.GenericAPIView):
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.validated_data['password'] = make_password(serializer.validated_data['password'])
+            #serializer.validated_data['password'] = make_password(serializer.validated_data['password'])
             
             serializer.validated_data['created_at'] = timezone.now()
             serializer.validated_data['updated_at'] = timezone.now()

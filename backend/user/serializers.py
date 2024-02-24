@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from .models import User
+from django.contrib.auth.hashers import make_password
 
 class SignupSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,16 +16,19 @@ class LoginSerializer(serializers.Serializer):
 
     def get_tokens(self, obj):
         user = obj
-        refresh = RefreshToken.for_user(user)
+        #refresh = RefreshToken.for_user(user)
         return {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token)
+            'refresh': user.tokens()['refresh'],
+            'access': user.tokens()['access']
         }
-
+    class Meta:
+        model = User
+        fields = ['password','email','tokens']
     def validate(self, attrs):
         email = attrs.get('email', '')
         password = attrs.get('password', '')
         user = authenticate(email=email, password=password)
+        #user = User.objects.get(email=email)
 
         if not user:
             raise serializers.ValidationError('Invalid email or password.')
