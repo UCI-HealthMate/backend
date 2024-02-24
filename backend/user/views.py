@@ -24,7 +24,7 @@ class LoginAPIView(generics.GenericAPIView):
     def post(self,request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(serializer.data,status=status.HTTP_200_OK) # When this line executes, there is an error with the database saying FOREIGN KEY constraint failed
     
 class LogoutAPIView(generics.GenericAPIView):
     serializer_class = LogoutSerializer
