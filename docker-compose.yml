@@ -59,6 +59,75 @@ services:
   #     - sqldb
   #   restart: always
 
+  redisdata:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  messagebroker:
+    image: rabbitmq:3.7-management
+    container_name: 'rabbitmq'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    expose:
+      - 5672
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    # depends_on:
+    #   - backend
+    tty: true
+
+  flower:
+    image: mher/flower
+    container_name: flower
+    ports:
+      - "5555:5555"
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@messagebroker
+      - FLOWER_PORT=5555
+      - FLOWER_BASIC_AUTH=guest:guest
+    depends_on:
+      - messagebroker
+  
+  celery-worker:
+    build:
+      context: ./backend
+    volumes:
+      - ./backend:/backend
+    container_name: celery-worker
+    command: celery -A healthmate worker --loglevel=info --concurrency=4
+    depends_on:
+      - messagebroker
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@messagebroker
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DJANGO_SETTINGS_MODULE=healthmate.settings
+
+  celery-beat:
+    build:
+      context: ./backend
+    volumes:
+      - ./backend:/backend
+    container_name: celery-beat
+    command: celery -A healthmate beat --loglevel=info
+    depends_on:
+      - celery-worker
+      - messagebroker
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@messagebroker
+      - DJANGO_SETTINGS_MODULE=healthmate.settings
+  
+  selenium:
+    image: seleniarm/standalone-chromium:latest
+    ports:
+      - "4444:4444"
+      - "5900:5900"
+      - "7900:7900"
+    shm_size: 2g
+
 volumes:
   db_data:
   pgadmin_data:

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'menu',
     'django_celery_beat',
     'celery',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -81,28 +82,28 @@ WSGI_APPLICATION = 'healthmate.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django_prometheus.db.backends.postgresql',
-#         'NAME': 'healthmate',
-#         'USER': 'team62',
-#         'PASSWORD': 'team62',
-#         # 'HOST': 'sqldb',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',  # Use 'django.db.backends.postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': BASE_DIR / 'db.sqlite3',  # Path to database file if using SQLite.
-        'USER': '',                        # Not used with SQLite.
-        'PASSWORD': '',                    # Not used with SQLite.
-        'HOST': '',                        # Set to empty string for localhost. Not used with SQLite.
-        'PORT': '',                        # Set to empty string for default. Not used with SQLite.
+        'ENGINE': 'django_prometheus.db.backends.postgresql',
+        'NAME': 'healthmate',
+        'USER': 'team62',
+        'PASSWORD': 'team62',
+        # 'HOST': 'sqldb',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',  # Use 'django.db.backends.postgresql', 'mysql', 'sqlite3' or 'oracle'.
+#         'NAME': BASE_DIR / 'db.sqlite3',  # Path to database file if using SQLite.
+#         'USER': '',                        # Not used with SQLite.
+#         'PASSWORD': '',                    # Not used with SQLite.
+#         'HOST': '',                        # Set to empty string for localhost. Not used with SQLite.
+#         'PORT': '',                        # Set to empty string for default. Not used with SQLite.
+#     }
+# }
 
 
 
@@ -148,12 +149,13 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# CELERY_BROKER_URL = 'amqp://guest:guest@localhost'
-# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = 'amqp://guest:guest@messagebroker:'
 
-CELERY_BEAT_SCHEDULE = {
-    'fetch-menu': {
-        'task': 'healthmate.tasks.fetch_and_update_menu',
-        'schedule': timedelta(weeks=1),  # Run the task every week
-    },
-}
+CELERY_RESULT_BACKEND = 'redis://redisdata:6379/0'
+
+# CELERY_BEAT_SCHEDULE = {
+#     'fetch-menu': {
+#         'task': 'healthmate.tasks.fetch_and_update_menu',
+#         'schedule': timedelta(weeks=1),  # Run the task every week
+#     },
+# }

@@ -1,5 +1,6 @@
 import requests
 import json
+from datetime import datetime
 
 headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
@@ -18,8 +19,8 @@ headers = {
     'Upgrade-Insecure-Requests': '1',
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
 }
-
-response = requests.get("https://uci.campusdish.com/api/menu/GetMenus?locationId=3314&storeIds=&mode=Weekly&date=02/19/2024&time=&periodId=106&fulfillmentMethod=", headers=headers)
+menuWeekDate = datetime.now().strftime("%m/%d/%Y")
+response = requests.get(f"https://uci.campusdish.com/api/menu/GetMenus?locationId=3314&storeIds=&mode=Weekly&date={menuWeekDate}&time=&periodId=106&fulfillmentMethod=", headers=headers)
 formatted_string = json.dumps(response.json(), indent=2)
 print(formatted_string)
 
