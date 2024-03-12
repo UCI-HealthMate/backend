@@ -25,7 +25,6 @@ def get_cookie_string():
     return cookie_string
 
 def send_request_for_data(cookie_string):
-    print(cookie_string)
     headers = {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
         'Accept-Encoding': 'gzip, deflate, br',
@@ -56,11 +55,12 @@ def parse_data(data):
     Menu.objects.all().delete()
     n = 0
     for i in data:
+        print(i)
         item = i['Product']
         Menu.objects.create(
             name = item['MarketingName'] if item['MarketingName'] != None else "",
             description = item['ShortDescription'],
-            period = translate_period(item['PeriodId']),
+            period = translate_period(i['PeriodId']),
             containsEggs = item['ContainsEggs'] if item['ContainsEggs'] != None else False,
             containsFish = item['ContainsFish'] if item['ContainsFish'] != None else False,
             containsMilk = item['ContainsMilk'] if item['ContainsMilk'] != None else False,
@@ -85,10 +85,11 @@ def parse_data(data):
             sugars = float(item['Sugars']) if item['Sugars'] != None else 0.00,
             protein = float(item['Protein']) if item['Protein'] != None else 0.00,
             vitaminA = float(item['VitaminA']) if item['VitaminA'] != None else 0.00,
-            vitaminC = float(item['VitaminC']) if item['VitaminC'] != None else 0.00,
+            vitaminC = float(item['VitaminC']) if isinstance(item['VitaminC'], str) and item['VitaminC'].isdigit() else 0.00,
             calcium = float(item['Calcium']) if item['Calcium'] != None else 0.00,
             iron = float(item['Iron']) if item['Iron'] != None else 0.00,
             saturatedFat = float(item['SaturatedFat']) if item['SaturatedFat'] != None else 0.00,
+            station = translate_station(i['StationId']),
             date = datetime.now()    
         )
         n += 1  
@@ -109,7 +110,25 @@ def translate_period(period_num):
     }
     if period_num not in period_dict:
         return ""
-    return period_dict[int(period_num)]
+    return period_dict[period_num]
+
+def translate_station(stationId):
+    station_dict = {
+        "32801": "Grubb/Mainline",
+        "32802": "Ember/Grill",
+        "32803": "Crossroads",
+        "32804": "Honeycakes/Bakery",
+        "32805": "The Farm Stand/Salad Bar",
+        "32806": "Hearth/Pizza",
+        "32807": "Saute",
+        "32808": "Soups",
+        "32809": "The Farm Stand/Deli",
+        "32810": "Vegan",
+        "32811": "Compass",
+    }
+    if stationId not in station_dict:
+        return ""
+    return station_dict[stationId]
 
 @shared_task
 def fetch_and_update_menu():

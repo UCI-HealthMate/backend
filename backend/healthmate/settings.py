@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_prometheus',
+    'healthmate',
     'user',
     'menu',
     'django_celery_beat',
@@ -89,8 +90,8 @@ DATABASES = {
         'NAME': 'healthmate',
         'USER': 'team62',
         'PASSWORD': 'team62',
-        'HOST': 'sqldb',
-        # 'HOST': 'localhost',
+        # 'HOST': 'sqldb',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }

@@ -33,7 +33,8 @@ class Menu(models.Model):
     vitaminC = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
     calcium = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
     iron = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
-    saturatedFat = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)                                
+    saturatedFat = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)  
+    station = models.CharField(max_length=50, default="")                              
     date = models.DateField()
     
     def __str__(self):
