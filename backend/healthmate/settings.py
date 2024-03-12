@@ -88,8 +88,8 @@ DATABASES = {
         'NAME': 'healthmate',
         'USER': 'team62',
         'PASSWORD': 'team62',
-        # 'HOST': 'sqldb',
-        'HOST': 'localhost',
+        'HOST': 'sqldb',
+        # 'HOST': 'localhost',
         'PORT': '5432',
     }
 }

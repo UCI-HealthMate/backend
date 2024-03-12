@@ -1,19 +1,19 @@
 version: '3.3'
 
 services:
-  # django:
-  #   build:
-  #     context: ./backend
-  #   container_name: django
-  #   command: >
-  #       bash -c "python manage.py migrate && gunicorn teami.wsgi --bind 0.0.0.0:8000"
-  #   volumes:
-  #     - ./backend:/backend/
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     - sqldb
-  #   restart: always
+  django:
+    build:
+      context: ./backend
+    container_name: django
+    command: >
+        bash -c "python manage.py migrate && gunicorn healthmate.wsgi --bind 0.0.0.0:8000"
+    volumes:
+      - ./backend:/backend/
+    ports:
+      - "8000:8000"
+    depends_on:
+      - sqldb
+    restart: always
     # env_file:
     #   - .env
 
