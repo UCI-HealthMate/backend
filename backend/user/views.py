@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from django.utils import timezone
 from drf_yasg.utils import swagger_auto_schema
 
-class SignUp(APIView):
+class Signup(APIView):
     @swagger_auto_schema(request_body=UserSerializer)
     def post(self, request):
         serializer = UserSerializer(data=request.data)
