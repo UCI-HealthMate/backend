@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'menu',
     'django_celery_beat',
     'celery',
-    'django.contrib.staticfiles',
     'drf_yasg',
     'rest_framework',
 ]
