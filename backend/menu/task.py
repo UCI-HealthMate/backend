@@ -47,7 +47,6 @@ def send_request_for_data(cookie_string):
     try:
         response = requests.get(f"https://uci.campusdish.com/api/menu/GetMenus?locationId=3314&storeIds=&mode=Daily&date={menuWeekDate}&time=&49=106&fulfillmentMethod=", headers=headers)
     except Exception as e:
-        print(e)
         raise Exception("Failed to fetch data")
     if response.status_code != 200:
         raise Exception("Failed to fetch data")

@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
 from menu.task import fetch_and_update_menu
+from drf_yasg.utils import swagger_auto_schema
 
 @api_view(['POST', 'GET'])
 def trigger_task(request):
