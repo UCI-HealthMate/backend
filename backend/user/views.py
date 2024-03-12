@@ -2,11 +2,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from .serializers import UserSerializer
-from django.contrib.auth import authenticate
-from django.utils import timezone
 from drf_yasg.utils import swagger_auto_schema
+from .models import User
 
 class Signup(APIView):
     @swagger_auto_schema(request_body=UserSerializer)
@@ -15,24 +14,27 @@ class Signup(APIView):
         if serializer.is_valid():
             serializer.validated_data['password'] = make_password(serializer.validated_data['password'])
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"message": "User created successfully"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class Login(APIView):
     @swagger_auto_schema(request_body=UserSerializer)
     def post(self, request):
-        username = request.data.get('username')
+        email = request.data.get('email')
         password = request.data.get('password')
-        user = authenticate(username=username, password=password)
+        user = User.objects.filter(email=email).first()
         if user:
+            if not check_password(password, user.password):
+                return Response({'error': 'Invalid Password'}, status=status.HTTP_401_UNAUTHORIZED)
             access_token = AccessToken.for_user(user)
             refresh_token = RefreshToken.for_user(user)
+
             response = Response({'message': 'Logged in successfully'}, status=status.HTTP_200_OK)
             response.set_cookie('access_token', str(access_token), httponly=True)
             response.set_cookie('refresh_token', str(refresh_token), httponly=True)
             return response
         else:
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'error': 'Invalid User'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class Logout(APIView):
     @swagger_auto_schema(request_body=UserSerializer)
