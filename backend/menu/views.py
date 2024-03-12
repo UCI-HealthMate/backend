@@ -8,19 +8,26 @@ from django.utils import timezone
 from menu.task import fetch_and_update_menu
 from drf_yasg.utils import swagger_auto_schema
 
-@api_view(['POST', 'GET'])
-def trigger_task(request):
-    fetch_and_update_menu.delay()
-    return Response({'message': 'Task triggered successfully'}, status=status.HTTP_200_OK)
+class Menu(APIView):
+    @swagger_auto_schema(
+        operation_description="Get Recommended Menu",
+        responses={200: 'Menu fetched successfully', 400: 'Bad Request'}
+    )
+    def get(self, request):
+        pass
+    
+    @swagger_auto_schema(
+        operation_description="Update User Menu",
+        responses={200: 'Menu updated successfully', 400: 'Bad Request'}
+    )
+    def post(self, request):
+        pass
 
-# periodMap = {
-#     "107" : "dinner",
-#     "49" : "breakfast",
-#     "106" : "lunch",
-#     "2651" : "brunch",
-#     "108" : "late night",
-# }
-
-# class Menu(APIView):
-#     def get(self, request):
-#         pass
+class Trigger(APIView):
+    @swagger_auto_schema(
+        operation_description="Trigger task",
+        responses={200: 'Task triggered successfully', 400: 'Bad Request'}
+    )
+    def gets(self, request):
+        fetch_and_update_menu.delay()
+        return Response({'message': 'Task triggered successfully'}, status=status.HTTP_200_OK)

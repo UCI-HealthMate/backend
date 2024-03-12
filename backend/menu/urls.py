@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import trigger_task
+from .views import Trigger, Menu
 
 urlpatterns = [
-    path('trigger/', trigger_task, name='trigger_task'),
-    # Other URL patterns...
+    path('trigger/', Trigger.as_view(), name='trigger_task'),
+    path('menu/', Menu.as_view(), name='menu'),
 ]

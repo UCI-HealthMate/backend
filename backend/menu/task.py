@@ -102,7 +102,7 @@ def translate_period(period_num):
         "49": "Breakfast",
         "106": "Lunch",
         "2651": "Brunch",
-        "108": "Late Night"
+        "108": "Late"
         # 1180:
         # 3818:
         # 3819: 
