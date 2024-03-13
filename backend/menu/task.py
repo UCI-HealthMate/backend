@@ -55,7 +55,6 @@ def parse_data(data):
     Menu.objects.all().delete()
     n = 0
     for i in data:
-        print(i)
         item = i['Product']
         Menu.objects.create(
             name = item['MarketingName'] if item['MarketingName'] != None else "",
@@ -92,10 +91,8 @@ def parse_data(data):
             station = translate_station(i['StationId']),
             date = datetime.now()    
         )
-        n += 1  
-        if n ==5:
-            break
-    print("Data has been updated")
+        n += 1
+    print(f"{i} items have been added to the database.")
 
 def translate_period(period_num):
     period_dict = {
