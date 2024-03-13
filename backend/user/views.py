@@ -14,7 +14,13 @@ class Signup(APIView):
         if serializer.is_valid():
             serializer.validated_data['password'] = make_password(serializer.validated_data['password'])
             serializer.save()
-            return Response({"message": "User created successfully"}, status=status.HTTP_201_CREATED)
+            user = User.objects.filter(email=request.data.get('email')).first()
+            access_token = AccessToken.for_user(user)
+            refresh_token = RefreshToken.for_user(user)
+            response = Response({"message": "User created and logged in successfully"}, status=status.HTTP_201_CREATED)
+            response.set_cookie('access_token', str(access_token), httponly=True)
+            response.set_cookie('refresh_token', str(refresh_token), httponly=True)
+            return response
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class Login(APIView):

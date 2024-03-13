@@ -44,7 +44,7 @@ def send_request_for_data(cookie_string):
     }
     menuWeekDate = datetime.now().strftime("%m/%d/%Y")
     try:
-        response = requests.get(f"https://uci.campusdish.com/api/menu/GetMenus?locationId=3314&storeIds=&mode=Daily&date={menuWeekDate}&time=&49=106&fulfillmentMethod=", headers=headers)
+        response = requests.get(f"https://uci.campusdish.com/api/menu/GetMenus?locationId=3314&storeIds=&mode=Daily&date={menuWeekDate}&time=&periodId=106&fulfillmentMethod=", headers=headers)
     except Exception as e:
         raise Exception("Failed to fetch data")
     if response.status_code != 200:
@@ -74,25 +74,25 @@ def parse_data(data):
             isKosher = item['IsKosher'] if item['IsKosher'] != None else False,
             isVegan = item['IsVegan'] if item['IsVegan'] != None else False,
             isVegetarian = item['IsVegetarian'] if item['IsVegetarian'] != None else False,
-            calories = float(item['Calories']) if item['Calories'] != None else 0.00,
-            caloriesFromFat = float(item['CaloriesFromFat']) if item['CaloriesFromFat'] != None else 0.00,
-            totalFat = float(item['TotalFat']) if item['TotalFat'] != None else 0.00,
-            transFat = float(item['TransFat']) if item['TransFat'] != None else 0.00,
-            cholesterol = float(item['Cholesterol']) if item['Cholesterol'] != None else 0.00,
-            sodium = float(item['Sodium']) if item['Sodium'] != None else 0.00,
-            totalCarbohydrates = float(item['TotalCarbohydrates']) if item['TotalCarbohydrates'] != None else 0.00,
-            sugars = float(item['Sugars']) if item['Sugars'] != None else 0.00,
-            protein = float(item['Protein']) if item['Protein'] != None else 0.00,
-            vitaminA = float(item['VitaminA']) if item['VitaminA'] != None else 0.00,
+            calories = float(item['Calories']) if isinstance(item['Calories'], str) and item['Calories'].isdigit() else 0.00,
+            caloriesFromFat = float(item['CaloriesFromFat']) if isinstance(item['CaloriesFromFat'], str) and item['CaloriesFromFat'].isdigit() else 0.00,
+            totalFat = float(item['TotalFat']) if isinstance(item['TotalFat'], str) and item['TotalFat'].isdigit() else 0.00,
+            transFat = float(item['TransFat']) if isinstance(item['TransFat'], str) and item['TransFat'].isdigit() else 0.00,
+            cholesterol = float(item['Cholesterol']) if isinstance(item['Cholesterol'], str) and item['Cholesterol'].isdigit() else 0.00,
+            sodium = float(item['Sodium']) if isinstance(item['Sodium'], str) and item['Sodium'].isdigit() else 0.00,
+            totalCarbohydrates = float(item['TotalCarbohydrates']) if isinstance(item['TotalCarbohydrates'], str) and item['TotalCarbohydrates'].isdigit() else 0.00,
+            sugars = float(item['Sugars']) if isinstance(item['Sugars'], str) and item['Sugars'].isdigit() else 0.00,
+            protein = float(item['Protein']) if isinstance(item['Protein'], str) and item['Protein'].isdigit() else 0.00,
+            vitaminA = float(item['VitaminA']) if isinstance(item['VitaminA'], str) and item['VitaminA'].isdigit() else 0.00,
             vitaminC = float(item['VitaminC']) if isinstance(item['VitaminC'], str) and item['VitaminC'].isdigit() else 0.00,
-            calcium = float(item['Calcium']) if item['Calcium'] != None else 0.00,
-            iron = float(item['Iron']) if item['Iron'] != None else 0.00,
-            saturatedFat = float(item['SaturatedFat']) if item['SaturatedFat'] != None else 0.00,
+            calcium = float(item['Calcium']) if isinstance(item['Calcium'], str) and item['Calcium'].isdigit() else 0.00,
+            iron = float(item['Iron']) if isinstance(item['Iron'], str) and item['Iron'].isdigit() else 0.00,
+            saturatedFat = float(item['SaturatedFat']) if isinstance(item['SaturatedFat'], str) and item['SaturatedFat'].isdigit() else 0.00,
             station = translate_station(i['StationId']),
             date = datetime.now()    
-        )
+            )
         n += 1
-    print(f"{i} items have been added to the database.")
+    return f"{i} items have been added to the database."
 
 def translate_period(period_num):
     period_dict = {
@@ -132,9 +132,9 @@ def fetch_and_update_menu():
     cookie_string = get_cookie_string()
     menu_data = send_request_for_data(cookie_string)
     menu_items = menu_data['Menu']["MenuProducts"]
-    parse_data(menu_items)
-    return "Data has been updated"    
+    v = parse_data(menu_items)
+    return v 
 
-if __name__ == "__main__":
-    formatted_string = json.dumps(send_request_for_data(get_cookie_string()), indent=2)
-    print(formatted_string)
+# if __name__ == "__main__":
+#     formatted_string = json.dumps(send_request_for_data(get_cookie_string()), indent=2)
+#     print(formatted_string)
