@@ -24,14 +24,15 @@ def get_cookie_string():
     print('passed')
     return cookie_string
 
-def send_request_for_data(cookie_string):
+def send_request_for_data(cookie_string, period):
+    menuWeekDate = datetime.now().strftime("%m/%d/%Y")
     headers = {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
         'Accept-Encoding': 'gzip, deflate, br',
         'Accept-Language': 'ko-KR,ko;q=0.9',
         'Cache-Control': 'max-age=0',
         'Cookie': cookie_string,
-        'Referer': 'https://uci.campusdish.com/api/menu/GetMenus?locationId=3314&storeIds=&mode=Weekly&date=02/19/2024&time=&periodId=106&fulfillmentMethod=',
+        'Referer': f'https://uci.campusdish.com/api/menu/GetMenus?locationId=3314&storeIds=&mode=Weekly&date={menuWeekDate}&time=&periodId=&fulfillmentMethod=',
         'Sec-Ch-Ua': '"Not A(Brand";v="99", "Google Chrome";v="121", "Chromium";v="121"',
         'Sec-Ch-Ua-Mobile': '?0',
         'Sec-Ch-Ua-Platform': '"macOS"',
@@ -42,9 +43,8 @@ def send_request_for_data(cookie_string):
         'Upgrade-Insecure-Requests': '1',
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
     }
-    menuWeekDate = datetime.now().strftime("%m/%d/%Y")
     try:
-        response = requests.get(f"https://uci.campusdish.com/api/menu/GetMenus?locationId=3314&storeIds=&mode=Daily&date={menuWeekDate}&time=&periodId=106&fulfillmentMethod=", headers=headers)
+        response = requests.get(f"https://uci.campusdish.com/api/menu/GetMenus?locationId=3314&storeIds=&mode=Daily&date={menuWeekDate}&time=&periodId={period}&fulfillmentMethod=", headers=headers)
     except Exception as e:
         raise Exception("Failed to fetch data")
     if response.status_code != 200:
@@ -52,7 +52,6 @@ def send_request_for_data(cookie_string):
     return response.json()
 
 def parse_data(data):
-    Menu.objects.all().delete()
     n = 0
     for i in data:
         item = i['Product']
@@ -92,7 +91,7 @@ def parse_data(data):
             date = datetime.now()    
             )
         n += 1
-    return f"{i} items have been added to the database."
+    return n
 
 def translate_period(period_num):
     period_dict = {
@@ -130,10 +129,16 @@ def translate_station(stationId):
 @shared_task
 def fetch_and_update_menu():
     cookie_string = get_cookie_string()
-    menu_data = send_request_for_data(cookie_string)
-    menu_items = menu_data['Menu']["MenuProducts"]
-    v = parse_data(menu_items)
-    return v 
+    avail_periods = send_request_for_data(cookie_string, "")["Menu"]["MenuPeriods"]
+    avail_period_ids = [i["PeriodId"] for i in avail_periods]
+    
+    total_parsed = 0
+    Menu.objects.all().delete()
+    for i in avail_period_ids:
+        menu_data = send_request_for_data(cookie_string, i)
+        menu_items = menu_data['Menu']["MenuProducts"]
+        total_parsed += parse_data(menu_items)
+    return f"{total_parsed} items have been parsed and updated"
 
 # if __name__ == "__main__":
 #     formatted_string = json.dumps(send_request_for_data(get_cookie_string()), indent=2)

@@ -8,6 +8,7 @@ from rest_framework import status
 from menu.task import fetch_and_update_menu
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework_simplejwt.tokens import AccessToken
+from user.models import User
 
 class Items(APIView):
     @swagger_auto_schema(
@@ -19,10 +20,15 @@ class Items(APIView):
         if not access_token:
             return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
         token = AccessToken(access_token)
-        user_email = token['email']
-        if user_email is None:
+        token_data = token.payload
+        user_id = token_data.get('user_id')
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return None
+        if user_id is None:
             return Response({'error': 'Invalid Token'}, status=status.HTTP_401_UNAUTHORIZED)
-        return Response({'message': f'user email for testing: {user_email}'}, status=status.HTTP_200_OK)
+        return Response({'message': f'user email for testing: {user.email}'}, status=status.HTTP_200_OK)
         
     
     @swagger_auto_schema(
@@ -34,10 +40,15 @@ class Items(APIView):
         if not access_token:
             return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
         token = AccessToken(access_token)
-        user_email = token['email']
-        if user_email is None:
+        token_data = token.payload
+        user_id = token_data.get('user_id')
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return None
+        if user_id is None:
             return Response({'error': 'Invalid Token'}, status=status.HTTP_401_UNAUTHORIZED)
-        return Response({'message': f'user email for testing: {user_email}'}, status=status.HTTP_200_OK)
+        return Response({'message': f'user email for testing: {user.email}'}, status=status.HTTP_200_OK)
 
 class Trigger(APIView):
     @swagger_auto_schema(
