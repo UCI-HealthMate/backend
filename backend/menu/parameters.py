@@ -12,7 +12,35 @@ menu_parameters = [
         name="timeInBed",
         in_=openapi.IN_QUERY,
         type=openapi.TYPE_NUMBER,
-        description="Calories for the menu",
+        description="Sleep Time in hours",
+        required=False
+    ),
+    openapi.Parameter(
+        name="bodyFat",
+        in_=openapi.IN_QUERY,
+        type=openapi.TYPE_NUMBER,
+        description="Body Fat Percentage",
+        required=False
+    ),
+    openapi.Parameter(
+        name="height",
+        in_=openapi.IN_QUERY,
+        type=openapi.TYPE_NUMBER,
+        description="Height of user in inches",
+        required=False
+    ),
+    openapi.Parameter(
+        name="weight",
+        in_=openapi.IN_QUERY,
+        type=openapi.TYPE_NUMBER,
+        description="Weight of user in pounds",
+        required=False
+    ),
+    openapi.Parameter(
+        name="age",
+        in_=openapi.IN_QUERY,
+        type=openapi.TYPE_NUMBER,
+        description="Age of user",
         required=False
     ),
     openapi.Parameter(

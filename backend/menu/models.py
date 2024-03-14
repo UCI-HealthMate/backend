@@ -3,8 +3,6 @@ from django.db import models
 class Menu(models.Model):
     name = models.CharField(max_length=128, default="")
     description = models.TextField(default="")
-    # day = models.CharField(max_length=2)
-    # price = models.DecimalField(max_digits=6, decimal_places=2)
     period = models.CharField(max_length=25, default="")
     containsEggs = models.BooleanField(default=False)
     containsFish = models.BooleanField(default=False)

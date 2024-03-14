@@ -33,38 +33,35 @@ class Items(APIView):
             return Response({'error': 'Invalid Token'}, status=status.HTTP_401_UNAUTHORIZED)
         options = ["Breakfast", "Brunch", "Lunch", "Dinner", "Late"]
         menu_dict = {}
+        user_data = request.query_params
 
         for period in options:
-            # Initialize an empty dictionary for the period
             period_menus = {}
             
-            # Get the menu objects for the period
             if Menu.objects.filter(period=period).exists():
-                menu_objects = Menu.objects.filter(period=period).order_by('?')[:5]
-                
-                # Initialize an empty list for the menu items
+                qualified_menu_items = Menu.objects.filter(
+                    containsEggs=user_data['containsEggs'],
+                    containsFish=user_data['containsFish'],
+                    containsMilk=user_data['containsMilk'],
+                    containsPeanuts=user_data['containsPeanuts'],
+                    containsSesame=user_data['containsSesame'],
+                    containsShellfish=user_data['containsShellfish'],
+                    containsSoy=user_data['containsSoy'],
+                    containsTreeNuts=user_data['containsTreeNuts'],
+                    containsWheat=user_data['containsWheat'],
+                    isGlutenFree=user_data['isGlutenFree'],
+                    isHalal=user_data['isHalal'],
+                    isKosher=user_data['isKosher'],
+                    isVegan=user_data['isVegan'],
+                    isVegetarian=user_data['isVegetarian']
+                )
                 menu_items = []
                 
-                # Populate the menu items list with menu objects
-                for menu_obj in menu_objects:
+                for menu_obj in qualified_menu_items:
                     menu_item = {
                         "id": menu_obj.id,
                         "name": menu_obj.name,
                         "description": menu_obj.description,
-                        "containsEggs": menu_obj.containsEggs,
-                        "containsFish": menu_obj.containsFish,
-                        "containsMilk": menu_obj.containsMilk,
-                        "containsPeanuts": menu_obj.containsPeanuts,
-                        "containsSesame": menu_obj.containsSesame,
-                        "containsShellfish": menu_obj.containsShellfish,
-                        "containsSoy": menu_obj.containsSoy,
-                        "containsTreeNuts": menu_obj.containsTreeNuts,
-                        "containsWheat": menu_obj.containsWheat,
-                        "isGlutenFree": menu_obj.isGlutenFree,
-                        "isHalal": menu_obj.isHalal,
-                        "isKosher": menu_obj.isKosher,
-                        "isVegan": menu_obj.isVegan,
-                        "isVegetarian": menu_obj.isVegetarian,
                         "calories": menu_obj.calories,
                         "caloriesFromFat": menu_obj.caloriesFromFat,
                         "totalFat": menu_obj.totalFat,
@@ -79,7 +76,6 @@ class Items(APIView):
                         "calcium": menu_obj.calcium,
                         "iron": menu_obj.iron,
                         "saturatedFat": menu_obj.saturatedFat,
-                        "station": menu_obj.station
                     }
                     menu_items.append(menu_item)
                 
