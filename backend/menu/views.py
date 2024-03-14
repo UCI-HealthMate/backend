@@ -84,9 +84,9 @@ class Items(APIView):
                     menu_items.append(menu_item)
                 
                 # Populate the period dictionary with three ranks having the same menu items
-                period_menus["rank1"] = menu_items
-                period_menus["rank2"] = menu_items
-                period_menus["rank3"] = menu_items
+                period_menus["1"] = menu_items
+                period_menus["2"] = menu_items
+                period_menus["3"] = menu_items
                 
                 # Assign the period dictionary to the menu_dict
                 menu_dict[period] = period_menus
