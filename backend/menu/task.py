@@ -3,7 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import requests
 from datetime import datetime
-import json
+# import json
 from .models import Menu
 
 def get_cookie_string():

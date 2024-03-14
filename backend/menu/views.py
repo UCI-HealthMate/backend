@@ -9,10 +9,13 @@ from menu.task import fetch_and_update_menu
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework_simplejwt.tokens import AccessToken
 from user.models import User
+from .parameters import menu_parameters
+from .models import Menu
 
 class Items(APIView):
     @swagger_auto_schema(
         operation_description="Get Recommended Menu",
+        manual_parameters=menu_parameters,
         responses={200: 'Menu fetched successfully', 400: 'Bad Request'}
     )
     def get(self, request):
@@ -28,9 +31,53 @@ class Items(APIView):
             return None
         if user_id is None:
             return Response({'error': 'Invalid Token'}, status=status.HTTP_401_UNAUTHORIZED)
-        return Response({'message': f'user email for testing: {user.email}'}, status=status.HTTP_200_OK)
-        
-    
+        options = ["Breakfast", "Brunch", "Lunch", "Dinner", "Late"]
+        menu_dict = {}
+
+        for period in options:
+            menus = []
+            if Menu.objects.filter(period=period).exists():
+                menu_objects = Menu.objects.filter(period=period).order_by('?')[:5]
+                for menu_obj in menu_objects:
+                    menu_dict_item = {
+                        "id": menu_obj.id,
+                        "name": menu_obj.name,
+                        "description": menu_obj.description,
+                        "containsEggs": menu_obj.containsEggs,
+                        "containsFish": menu_obj.containsFish,
+                        "containsMilk": menu_obj.containsMilk,
+                        "containsPeanuts": menu_obj.containsPeanuts,
+                        "containsSesame": menu_obj.containsSesame,
+                        "containsShellfish": menu_obj.containsShellfish,
+                        "containsSoy": menu_obj.containsSoy,
+                        "containsTreeNuts": menu_obj.containsTreeNuts,
+                        "containsWheat": menu_obj.containsWheat,
+                        "isGlutenFree": menu_obj.isGlutenFree,
+                        "isHalal": menu_obj.isHalal,
+                        "isKosher": menu_obj.isKosher,
+                        "isVegan": menu_obj.isVegan,
+                        "isVegetarian": menu_obj.isVegetarian,
+                        "calories": menu_obj.calories,
+                        "caloriesFromFat": menu_obj.caloriesFromFat,
+                        "totalFat": menu_obj.totalFat,
+                        "transFat": menu_obj.transFat,
+                        "cholesterol": menu_obj.cholesterol,
+                        "sodium": menu_obj.sodium,
+                        "totalCarbohydrates": menu_obj.totalCarbohydrates,
+                        "sugars": menu_obj.sugars,
+                        "protein": menu_obj.protein,
+                        "vitaminA": menu_obj.vitaminA,
+                        "vitaminC": menu_obj.vitaminC,
+                        "calcium": menu_obj.calcium,
+                        "iron": menu_obj.iron,
+                        "saturatedFat": menu_obj.saturatedFat,
+                        "station": menu_obj.station
+                    }
+                    menus.append(menu_dict_item)
+                menu_dict[period] = menus
+
+        return Response(menu_dict, status=status.HTTP_200_OK)
+
     @swagger_auto_schema(
         operation_description="Update User Menu",
         responses={200: 'Menu updated successfully', 400: 'Bad Request'}
