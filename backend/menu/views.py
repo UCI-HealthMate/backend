@@ -35,11 +35,19 @@ class Items(APIView):
         menu_dict = {}
 
         for period in options:
-            menus = []
+            # Initialize an empty dictionary for the period
+            period_menus = {}
+            
+            # Get the menu objects for the period
             if Menu.objects.filter(period=period).exists():
                 menu_objects = Menu.objects.filter(period=period).order_by('?')[:5]
+                
+                # Initialize an empty list for the menu items
+                menu_items = []
+                
+                # Populate the menu items list with menu objects
                 for menu_obj in menu_objects:
-                    menu_dict_item = {
+                    menu_item = {
                         "id": menu_obj.id,
                         "name": menu_obj.name,
                         "description": menu_obj.description,
@@ -73,10 +81,19 @@ class Items(APIView):
                         "saturatedFat": menu_obj.saturatedFat,
                         "station": menu_obj.station
                     }
-                    menus.append(menu_dict_item)
-                menu_dict[period] = menus
+                    menu_items.append(menu_item)
+                
+                # Populate the period dictionary with three ranks having the same menu items
+                period_menus["rank1"] = menu_items
+                period_menus["rank2"] = menu_items
+                period_menus["rank3"] = menu_items
+                
+                # Assign the period dictionary to the menu_dict
+                menu_dict[period] = period_menus
 
+        # Return the menu_dict in the response
         return Response(menu_dict, status=status.HTTP_200_OK)
+
 
     @swagger_auto_schema(
         operation_description="Update User Menu",
