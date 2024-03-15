@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,7 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_prometheus',
+    'healthmate',
     'user',
+    'menu',
+    'django_celery_beat',
+    'celery',
+    'drf_yasg',
+    'rest_framework',
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -77,28 +85,28 @@ WSGI_APPLICATION = 'healthmate.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django_prometheus.db.backends.postgresql',
-#         'NAME': 'healthmate',
-#         'USER': 'team62',
-#         'PASSWORD': 'team62',
-#         # 'HOST': 'sqldb',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',  # Use 'django.db.backends.postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': BASE_DIR / 'db.sqlite3',  # Path to database file if using SQLite.
-        'USER': '',                        # Not used with SQLite.
-        'PASSWORD': '',                    # Not used with SQLite.
-        'HOST': '',                        # Set to empty string for localhost. Not used with SQLite.
-        'PORT': '',                        # Set to empty string for default. Not used with SQLite.
+        'ENGINE': 'django_prometheus.db.backends.postgresql',
+        'NAME': 'healthmate',
+        'USER': 'team62',
+        'PASSWORD': 'team62',
+        'HOST': 'sqldb',
+        # 'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',  # Use 'django.db.backends.postgresql', 'mysql', 'sqlite3' or 'oracle'.
+#         'NAME': BASE_DIR / 'db.sqlite3',  # Path to database file if using SQLite.
+#         'USER': '',                        # Not used with SQLite.
+#         'PASSWORD': '',                    # Not used with SQLite.
+#         'HOST': '',                        # Set to empty string for localhost. Not used with SQLite.
+#         'PORT': '',                        # Set to empty string for default. Not used with SQLite.
+#     }
+# }
 
 
 
@@ -135,10 +143,30 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
+import os
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+CELERY_BROKER_URL = 'amqp://guest:guest@messagebroker:'
+
+CELERY_RESULT_BACKEND = 'redis://redisdata:6379/0'
+
+# CELERY_BEAT_SCHEDULE = {
+#     'fetch-menu': {
+#         'task': 'healthmate.tasks.fetch_and_update_menu',
+#         'schedule': timedelta(weeks=1),  # Run the task every week
+#     },
+# }
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=365),
+}
