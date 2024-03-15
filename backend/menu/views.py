@@ -12,6 +12,7 @@ from user.models import User
 from .parameters import menu_parameters
 from .models import Menu
 from .algorithm import find_menu_combinations, calculate_bmr, rank_menu_combinations, distribute_calories_with_brunch, distribute_calories_with_late, get_top_3_combinations
+from .helper import convert_to_boolean
 
 class Items(APIView):
     @swagger_auto_schema(
@@ -35,7 +36,8 @@ class Items(APIView):
         options = ["Breakfast", "Brunch", "Lunch", "Dinner", "Late"]
         menu_dict = {}
         user_data = request.query_params
-        bmr = calculate_bmr(user_data['sex'], user_data['age'], user_data['height'], user_data['weight'], user_data['timeInBed'],user_data['calories'])
+        bmr = calculate_bmr(user_data['sex'], float(user_data['age']), float(user_data['height']), float(user_data['weight']), float(user_data['timeInBed']),float(user_data['calories']))
+        print("BMR: ", bmr)
         if Menu.objects.filter(period="Brunch").exists():
             options = ["Breakfast", "Brunch", "Dinner"]
             distributed_calories = distribute_calories_with_brunch(bmr)
@@ -45,25 +47,40 @@ class Items(APIView):
 
         for period_option in options:
             period_menus = {}
-            
+
             qualified_menu_items = Menu.objects.filter(
-                period=period_option,
-                containsEggs=user_data['containsEggs'],
-                containsFish=user_data['containsFish'],
-                containsMilk=user_data['containsMilk'],
-                containsPeanuts=user_data['containsPeanuts'],
-                containsSesame=user_data['containsSesame'],
-                containsShellfish=user_data['containsShellfish'],
-                containsSoy=user_data['containsSoy'],
-                containsTreeNuts=user_data['containsTreeNuts'],
-                containsWheat=user_data['containsWheat'],
-                isGlutenFree=user_data['isGlutenFree'],
-                isHalal=user_data['isHalal'],
-                isKosher=user_data['isKosher'],
-                isVegan=user_data['isVegan'],
-                isVegetarian=user_data['isVegetarian']
+                period=period_option
             )
-            combos = find_menu_combinations(qualified_menu_items, distributed_calories[period_option], 5)
+            if convert_to_boolean(user_data['containsEggs']):
+                qualified_menu_items = qualified_menu_items.filter(containsEggs=True)
+            if convert_to_boolean(user_data['containsFish']):
+                qualified_menu_items = qualified_menu_items.filter(containsFish=True)
+            if convert_to_boolean(user_data['containsMilk']):
+                qualified_menu_items = qualified_menu_items.filter(containsMilk=True)
+            if convert_to_boolean(user_data['containsPeanuts']):
+                qualified_menu_items = qualified_menu_items.filter(containsPeanuts=True)
+            if convert_to_boolean(user_data['containsSesame']):
+                qualified_menu_items = qualified_menu_items.filter(containsSesame=True)
+            if convert_to_boolean(user_data['containsShellfish']):
+                qualified_menu_items = qualified_menu_items.filter(containsShellfish=True)
+            if convert_to_boolean(user_data['containsSoy']):
+                qualified_menu_items = qualified_menu_items.filter(containsSoy=True)
+            if convert_to_boolean(user_data['containsTreeNuts']):
+                qualified_menu_items = qualified_menu_items.filter(containsTreeNuts=True)
+            if convert_to_boolean(user_data['containsWheat']):
+                qualified_menu_items = qualified_menu_items.filter(containsWheat=True)
+            if convert_to_boolean(user_data['isGlutenFree']):
+                qualified_menu_items = qualified_menu_items.filter(isGlutenFree=True)
+            if convert_to_boolean(user_data['isHalal']):
+                qualified_menu_items = qualified_menu_items.filter(isHalal=True)
+            if convert_to_boolean(user_data['isKosher']):
+                qualified_menu_items = qualified_menu_items.filter(isKosher=True)
+            if convert_to_boolean(user_data['isVegan']):
+                qualified_menu_items = qualified_menu_items.filter(isVegan=True)
+            if convert_to_boolean(user_data['isVegetarian']):
+                qualified_menu_items = qualified_menu_items.filter(isVegetarian=True)
+
+            combos = find_menu_combinations(qualified_menu_items, distributed_calories[period_option], 4)
             ranked_combos = rank_menu_combinations(combos, distributed_calories[period_option])
             top_3_combos = get_top_3_combinations(ranked_combos)
                 
@@ -72,7 +89,6 @@ class Items(APIView):
             period_menus["3"] = top_3_combos[2]
                 
             menu_dict[period_option] = period_menus
-
         return Response(menu_dict, status=status.HTTP_200_OK)
 
 

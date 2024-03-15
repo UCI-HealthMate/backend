@@ -164,3 +164,8 @@ CELERY_RESULT_BACKEND = 'redis://redisdata:6379/0'
 #         'schedule': timedelta(weeks=1),  # Run the task every week
 #     },
 # }
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=365),
+}
