@@ -36,6 +36,7 @@ class Items(APIView):
         options = ["Breakfast", "Brunch", "Lunch", "Dinner", "Late"]
         menu_dict = {}
         user_data = request.query_params
+        print(user_data)
         bmr = calculate_bmr(user_data['sex'], float(user_data['age']), float(user_data['height']), float(user_data['weight']), float(user_data['timeInBed']),float(user_data['calories']))
         print("BMR: ", bmr)
         if Menu.objects.filter(period="Brunch").exists():
