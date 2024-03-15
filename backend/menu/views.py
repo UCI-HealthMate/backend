@@ -11,6 +11,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from user.models import User
 from .parameters import menu_parameters
 from .models import Menu
+from .algorithm import find_menu_combinations, calculate_bmr, rank_menu_combinations, distribute_calories_with_brunch, distribute_calories_with_late, get_top_3_combinations
 
 class Items(APIView):
     @swagger_auto_schema(
@@ -28,66 +29,50 @@ class Items(APIView):
         try:
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
-            return None
+            return Response({'error': 'User Not Found'}, status=status.HTTP_404_NOT_FOUND)
         if user_id is None:
             return Response({'error': 'Invalid Token'}, status=status.HTTP_401_UNAUTHORIZED)
         options = ["Breakfast", "Brunch", "Lunch", "Dinner", "Late"]
         menu_dict = {}
         user_data = request.query_params
+        bmr = calculate_bmr(user_data['sex'], user_data['age'], user_data['height'], user_data['weight'], user_data['timeInBed'],user_data['calories'])
+        if Menu.objects.filter(period="Brunch").exists():
+            options = ["Breakfast", "Brunch", "Dinner"]
+            distributed_calories = distribute_calories_with_brunch(bmr)
+        elif Menu.objects.filter(period="Lunch").exists():
+            options = ["Breakfast", "Lunch", "Dinner", "Late"]
+            distributed_calories = distribute_calories_with_late(bmr)
 
-        for period in options:
+        for period_option in options:
             period_menus = {}
             
-            if Menu.objects.filter(period=period).exists():
-                qualified_menu_items = Menu.objects.filter(
-                    containsEggs=user_data['containsEggs'],
-                    containsFish=user_data['containsFish'],
-                    containsMilk=user_data['containsMilk'],
-                    containsPeanuts=user_data['containsPeanuts'],
-                    containsSesame=user_data['containsSesame'],
-                    containsShellfish=user_data['containsShellfish'],
-                    containsSoy=user_data['containsSoy'],
-                    containsTreeNuts=user_data['containsTreeNuts'],
-                    containsWheat=user_data['containsWheat'],
-                    isGlutenFree=user_data['isGlutenFree'],
-                    isHalal=user_data['isHalal'],
-                    isKosher=user_data['isKosher'],
-                    isVegan=user_data['isVegan'],
-                    isVegetarian=user_data['isVegetarian']
-                )
-                menu_items = []
+            qualified_menu_items = Menu.objects.filter(
+                period=period_option,
+                containsEggs=user_data['containsEggs'],
+                containsFish=user_data['containsFish'],
+                containsMilk=user_data['containsMilk'],
+                containsPeanuts=user_data['containsPeanuts'],
+                containsSesame=user_data['containsSesame'],
+                containsShellfish=user_data['containsShellfish'],
+                containsSoy=user_data['containsSoy'],
+                containsTreeNuts=user_data['containsTreeNuts'],
+                containsWheat=user_data['containsWheat'],
+                isGlutenFree=user_data['isGlutenFree'],
+                isHalal=user_data['isHalal'],
+                isKosher=user_data['isKosher'],
+                isVegan=user_data['isVegan'],
+                isVegetarian=user_data['isVegetarian']
+            )
+            combos = find_menu_combinations(qualified_menu_items, distributed_calories[period_option], 5)
+            ranked_combos = rank_menu_combinations(combos, distributed_calories[period_option])
+            top_3_combos = get_top_3_combinations(ranked_combos)
                 
-                for menu_obj in qualified_menu_items:
-                    menu_item = {
-                        "id": menu_obj.id,
-                        "name": menu_obj.name,
-                        "description": menu_obj.description,
-                        "calories": menu_obj.calories,
-                        "caloriesFromFat": menu_obj.caloriesFromFat,
-                        "totalFat": menu_obj.totalFat,
-                        "transFat": menu_obj.transFat,
-                        "cholesterol": menu_obj.cholesterol,
-                        "sodium": menu_obj.sodium,
-                        "totalCarbohydrates": menu_obj.totalCarbohydrates,
-                        "sugars": menu_obj.sugars,
-                        "protein": menu_obj.protein,
-                        "vitaminA": menu_obj.vitaminA,
-                        "vitaminC": menu_obj.vitaminC,
-                        "calcium": menu_obj.calcium,
-                        "iron": menu_obj.iron,
-                        "saturatedFat": menu_obj.saturatedFat,
-                    }
-                    menu_items.append(menu_item)
+            period_menus["1"] = top_3_combos[0]
+            period_menus["2"] = top_3_combos[1]
+            period_menus["3"] = top_3_combos[2]
                 
-                # Populate the period dictionary with three ranks having the same menu items
-                period_menus["1"] = menu_items
-                period_menus["2"] = menu_items
-                period_menus["3"] = menu_items
-                
-                # Assign the period dictionary to the menu_dict
-                menu_dict[period] = period_menus
+            menu_dict[period_option] = period_menus
 
-        # Return the menu_dict in the response
         return Response(menu_dict, status=status.HTTP_200_OK)
 
 

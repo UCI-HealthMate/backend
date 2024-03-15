@@ -2,6 +2,13 @@ from drf_yasg import openapi
 
 menu_parameters = [
     openapi.Parameter(
+        name="sex",
+        in_=openapi.IN_QUERY,
+        type=openapi.TYPE_STRING,
+        description="User Biological Sex",
+        required=False
+    ),
+    openapi.Parameter(
         name="calories",
         in_=openapi.IN_QUERY,
         type=openapi.TYPE_NUMBER,
