@@ -82,6 +82,7 @@ class Items(APIView):
                 qualified_menu_items = qualified_menu_items.filter(isVegetarian=True)
 
             combos = find_menu_combinations(qualified_menu_items, distributed_calories[period_option], 4)
+            print(f"Length of {period_option} combo: ", len(combos))
             ranked_combos = rank_menu_combinations(combos, distributed_calories[period_option])
             top_3_combos = get_top_3_combinations(ranked_combos)
                 
