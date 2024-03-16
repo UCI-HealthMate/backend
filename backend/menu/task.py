@@ -26,6 +26,7 @@ def get_cookie_string():
 
 def send_request_for_data(cookie_string, period):
     menuWeekDate = datetime.now().strftime("%m/%d/%Y")
+    menuWeekDate = "03/15/2024" # this is just for testing
     headers = {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
         'Accept-Encoding': 'gzip, deflate, br',

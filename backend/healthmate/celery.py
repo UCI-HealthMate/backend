@@ -16,7 +16,7 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 app.conf.beat_schedule = {
     'import-menu-daily': {
         'task': 'menu.task.fetch_and_update_menu',
-        'schedule': crontab(minute=0, hour=0),  # Adjust the schedule as needed
+        'schedule': crontab(minute=0, hour=8),
     },
 }
 
